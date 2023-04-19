@@ -3,15 +3,15 @@ from __future__ import print_function
 import numpy as np
 import sys
 import time
-from Util import *
-from CLT_class import CLT
+from tpm.Util import *
+from tpm.CLT_class import CLT
 
-class MIXTURE_CLT:
+class MixtureCLT:
     
     def __init__(self):
         self.n_components = 0 # number of components
         self.mixture_probs = None # mixture probabilities
-        self.clt_list =[]   # List of Tree Bayesian networks
+        self.clt_list = []   # List of Tree Bayesian networks
         
 
     '''
@@ -19,10 +19,11 @@ class MIXTURE_CLT:
     '''
     def learn(self, dataset, n_components=2, max_iter=50, epsilon=1e-5):
         # For each component and each data point, we have a weight
-        weights=np.zeros((n_components,dataset.shape[0]))
+        weights = np.zeros((n_components,dataset.shape[0]))
 
         # Randomly initialize the chow-liu trees and the mixture probabilities
         # Your code for random initialization goes here
+
 
         for itr in range(max_iter):
             #E-step: Complete the dataset to yield a weighted dataset
