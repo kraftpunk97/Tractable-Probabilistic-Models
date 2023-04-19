@@ -15,28 +15,28 @@ import sys
 import time
 
 
-'''
-Class Chow-Liu Tree.
-Members:
-    nvariables: Number of variables
-    xycounts: 
-        Sufficient statistics: counts of value assignments to all pairs of variables
-        Four dimensional array: first two dimensions are variable indexes
-        last two dimensions are value indexes 00,01,10,11
-    xcounts:
-        Sufficient statistics: counts of value assignments to each variable
-        First dimension is variable, second dimension is value index [0][1]
-    xyprob:
-        xycounts converted to probabilities by normalizing them
-    xprob:
-        xcounts converted to probabilities by normalizing them
-    topo_order:
-        Topological ordering over the variables
-    parents:
-        Parent of each node. Parent[i] gives index of parent of variable indexed by i
-        If Parent[i]=-9999 then i is the root node
-'''
 class CLT:
+    """
+    Class Chow-Liu Tree.
+    Members:
+        nvariables: Number of variables
+        xycounts:
+            Sufficient statistics: counts of value assignments to all pairs of variables
+            Four dimensional array: first two dimensions are variable indexes
+            last two dimensions are value indexes 00,01,10,11
+        xcounts:
+            Sufficient statistics: counts of value assignments to each variable
+            First dimension is variable, second dimension is value index [0][1]
+        xyprob:
+            xycounts converted to probabilities by normalizing them
+        xprob:
+            xcounts converted to probabilities by normalizing them
+        topo_order:
+            Topological ordering over the variables
+        parents:
+            Parent of each node. Parent[i] gives index of parent of variable indexed by i
+            If Parent[i]=-9999 then i is the root node
+    """
     def __init__(self):
         self.nvariables = 0
         self.xycounts = np.ones((1, 1, 2, 2), dtype=int)
@@ -51,8 +51,8 @@ class CLT:
     '''
     def learn(self, dataset):
         self.nvariables = dataset.shape[1]
-        self.xycounts = Util.compute_xycounts(dataset) + 1 # laplace correction
-        self.xcounts = Util.compute_xcounts(dataset) + 2 # laplace correction
+        self.xycounts = Util.compute_xycounts(dataset) + 1  # laplace correction
+        self.xcounts = Util.compute_xcounts(dataset) + 2  # laplace correction
         self.xyprob = Util.normalize2d(self.xycounts)
         self.xprob = Util.normalize1d(self.xcounts)
         # compute mutual information score for all pairs of variables
@@ -63,7 +63,6 @@ class CLT:
         Tree = minimum_spanning_tree(csr_matrix(edgemat))
         # Convert the spanning tree to a Bayesian network
         self.topo_order, self.parents = depth_first_order(Tree, 0, directed=False)  
-
 
     '''
         Update the Chow-Liu Tree using weighted samples.
@@ -82,7 +81,7 @@ class CLT:
             # then laplace smoothing applied to "sum-weights" equals "sum-weights/num-examples"
             smooth = np.sum(weights)/ dataset.shape[0]
             self.xycounts = Util.compute_weighted_xycounts(dataset, weights) + smooth
-            self.xcounts = Util.compute_weighted_xcounts(dataset, weights) + 2.0 *smooth
+            self.xcounts = Util.compute_weighted_xcounts(dataset, weights) + 2.0 * smooth
         else:
             print('Error: Each example must have a weight')
             sys.exit(-1)
@@ -97,21 +96,21 @@ class CLT:
     '''
 
     def computeLL(self,dataset):
-        ll=0.0
+        ll = 0.0
         for i in range(dataset.shape[0]):
             for x in self.topo_order:
-                assignx=dataset[i,x]
+                assignx = dataset[i, x]
                 # if root sample from marginal
                 if self.parents[x] == -9999:
-                    ll+=np.log(self.xprob[x][assignx])
+                    ll += np.log(self.xprob[x][assignx])
                 else:
                     # sample from p(x|y)
                     y = self.parents[x]
                     assigny = dataset[i,y]
-                    ll+=np.log(self.xyprob[x, y, assignx, assigny] / self.xprob[y, assigny])
+                    ll += np.log(self.xyprob[x, y, assignx, assigny] / self.xprob[y, assigny])
         return ll
 
-    def getProb(self,sample):
+    def getProb(self, sample):
         prob = 1.0
         for x in self.topo_order:
             assignx = sample[x]
@@ -126,7 +125,7 @@ class CLT:
         return prob
 
 
-'''
+"""
     You can read the dataset using
     dataset=Util.load_dataset(path-of-the-file)
     
@@ -136,7 +135,7 @@ class CLT:
     
     To compute average log likelihood of a dataset, you can use
     clt.computeLL(dataset)/dataset.shape[0]
-'''
+"""
 
 
     

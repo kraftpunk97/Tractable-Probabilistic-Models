@@ -1,11 +1,12 @@
 import numpy as np
 import time
 
+
 class Util(object):
-    '''
+    """
         Purpose: Load the dataset in an object.
         Usage: dataset=Util.load_dataset(filename)
-    '''
+    """
     @staticmethod
     def load_dataset(filename):
         return np.loadtxt(filename, delimiter=',', dtype=np.uint32)
@@ -34,8 +35,8 @@ class Util(object):
     def compute_xcounts(dataset):
         nvariables = dataset.shape[1]
         prob_x = np.zeros((nvariables, 2))
-        prob_x[:,0]=np.einsum('ij->j',(dataset == 0).astype(int))
-        prob_x[:,1] = np.einsum('ij->j',(dataset == 1).astype(int))
+        prob_x[:, 0] = np.einsum('ij->j', (dataset == 0).astype(int))
+        prob_x[:, 1] = np.einsum('ij->j', (dataset == 1).astype(int))
         return prob_x
 
     '''
@@ -45,13 +46,17 @@ class Util(object):
         Alert: No Laplace correction is performed.
     '''
     @staticmethod
-    def compute_weighted_xycounts(dataset,weights):
-        nvariables=dataset.shape[1]
+    def compute_weighted_xycounts(dataset, weights):
+        nvariables = dataset.shape[1]
         prob_xy = np.zeros((nvariables, nvariables, 2, 2))
-        prob_xy[:, :, 0, 0] = np.einsum('ij,ik->jk', (dataset == 0).astype(int)* weights[:, np.newaxis], (dataset == 0).astype(int))
-        prob_xy[:, :, 0, 1] = np.einsum('ij,ik->jk', (dataset == 0).astype(int)* weights[:, np.newaxis], (dataset == 1).astype(int))
-        prob_xy[:, :, 1, 0] = np.einsum('ij,ik->jk', (dataset == 1).astype(int)* weights[:, np.newaxis], (dataset == 0).astype(int))
-        prob_xy[:, :, 1, 1] = np.einsum('ij,ik->jk', (dataset == 1).astype(int)* weights[:, np.newaxis], (dataset == 1).astype(int))
+        prob_xy[:, :, 0, 0] = np.einsum('ij,ik->jk',
+                                        (dataset == 0).astype(int) * weights[:, np.newaxis], (dataset == 0).astype(int))
+        prob_xy[:, :, 0, 1] = np.einsum('ij,ik->jk',
+                                        (dataset == 0).astype(int) * weights[:, np.newaxis], (dataset == 1).astype(int))
+        prob_xy[:, :, 1, 0] = np.einsum('ij,ik->jk',
+                                        (dataset == 1).astype(int) * weights[:, np.newaxis], (dataset == 0).astype(int))
+        prob_xy[:, :, 1, 1] = np.einsum('ij,ik->jk',
+                                        (dataset == 1).astype(int) * weights[:, np.newaxis], (dataset == 1).astype(int))
         return prob_xy
 
     '''
@@ -63,17 +68,17 @@ class Util(object):
     def compute_weighted_xcounts(dataset,weights):
         nvariables = dataset.shape[1]
         prob_x = np.zeros((nvariables, 2))
-        prob_x[:,0]=np.einsum('ij->j',(dataset == 0).astype(int) * weights[:, np.newaxis])
-        prob_x[:,1] = np.einsum('ij->j',(dataset == 1).astype(int) * weights[:, np.newaxis])
+        prob_x[:, 0] = np.einsum('ij->j', (dataset == 0).astype(int) * weights[:, np.newaxis])
+        prob_x[:, 1] = np.einsum('ij->j', (dataset == 1).astype(int) * weights[:, np.newaxis])
         return prob_x
     '''
         Purpose: Normalize a Bivariate Distribution
     '''
     @staticmethod
     def normalize2d(xycounts):
-        xycountsf=xycounts.astype(np.float64)
-        norm_const=np.einsum('ijkl->ij',xycountsf)
-        return xycountsf/norm_const[:,:,np.newaxis,np.newaxis]
+        xycountsf = xycounts.astype(np.float64)
+        norm_const = np.einsum('ijkl->ij', xycountsf)
+        return xycountsf/norm_const[:, :, np.newaxis,np.newaxis]
 
     '''
         Purpose: Normalize a Univariate Distribution
@@ -82,27 +87,27 @@ class Util(object):
     def normalize1d(xcounts):
         xcountsf = xcounts.astype(np.float64)
         norm_const = np.einsum('ij->i', xcountsf)
-        return xcountsf/norm_const[:,np.newaxis]
+        return xcountsf/norm_const[:, np.newaxis]
 
     '''
         Purpose: Normalize the weights
     '''
     @staticmethod
     def normalize(weights):
-        norm_const=np.sum(weights)
+        norm_const = np.sum(weights)
         return weights/norm_const
 
     '''
         Purpose: Compute the edge weights for the Chow-Liu Algorithm
     '''
     @staticmethod
-    def compute_MI_prob(p_xy,p_x):
+    def compute_MI_prob(p_xy, p_x):
         p_x_r = np.reciprocal(p_x)
         sum_xy=np.zeros((p_x_r.shape[0], p_x_r.shape[0]))
-        sum_xy += p_xy[:,:,0,0]*np.log(np.einsum('ij,i,j->ij',p_xy[:,:,0,0],p_x_r[:,0],p_x_r[:,0]))
-        sum_xy += p_xy[:,:,0,1]*np.log(np.einsum('ij,i,j->ij',p_xy[:,:,0,1],p_x_r[:,0],p_x_r[:,1]))
-        sum_xy += p_xy[:,:,1,0]*np.log(np.einsum('ij,i,j->ij',p_xy[:,:,1,0],p_x_r[:,1],p_x_r[:,0]))
-        sum_xy += p_xy[:,:,1,1]*np.log(np.einsum('ij,i,j->ij',p_xy[:,:,1,1],p_x_r[:,1],p_x_r[:,1]))
+        sum_xy += p_xy[:, :, 0, 0] * np.log(np.einsum('ij,i,j->ij', p_xy[:, :, 0, 0], p_x_r[:, 0], p_x_r[:, 0]))
+        sum_xy += p_xy[:, :, 0, 1] * np.log(np.einsum('ij,i,j->ij', p_xy[:, :, 0, 1], p_x_r[:, 0], p_x_r[:, 1]))
+        sum_xy += p_xy[:, :, 1, 0] * np.log(np.einsum('ij,i,j->ij', p_xy[:, :, 1, 0], p_x_r[:, 1], p_x_r[:, 0]))
+        sum_xy += p_xy[:, :, 1, 1] * np.log(np.einsum('ij,i,j->ij', p_xy[:, :, 1, 1], p_x_r[:, 1], p_x_r[:, 1]))
         return sum_xy
     
 
