@@ -6,7 +6,7 @@ import time
 from Util import *
 from CLT_class import CLT
 
-class MIXTURE_CLT():
+class MIXTURE_CLT:
     
     def __init__(self):
         self.n_components = 0 # number of components

@@ -75,11 +75,11 @@ class CLT:
         if not np.all(weights):
             print('Error: Weight of an example in the dataset is zero')
             sys.exit(-1)
-        if weights.shape[0]==dataset.shape[0]:
+        if weights.shape[0] == dataset.shape[0]:
             # Weighted laplace correction, note that num-examples=dataset.shape[0]
             # If 1-laplace smoothing is applied to num-examples,
             # then laplace smoothing applied to "sum-weights" equals "sum-weights/num-examples"
-            smooth = np.sum(weights)/ dataset.shape[0]
+            smooth = np.sum(weights) / dataset.shape[0]
             self.xycounts = Util.compute_weighted_xycounts(dataset, weights) + smooth
             self.xcounts = Util.compute_weighted_xcounts(dataset, weights) + 2.0 * smooth
         else:
@@ -95,7 +95,7 @@ class CLT:
         Compute the Log-likelihood score of the dataset
     '''
 
-    def computeLL(self,dataset):
+    def computeLL(self, dataset):
         ll = 0.0
         for i in range(dataset.shape[0]):
             for x in self.topo_order:
@@ -106,7 +106,7 @@ class CLT:
                 else:
                     # sample from p(x|y)
                     y = self.parents[x]
-                    assigny = dataset[i,y]
+                    assigny = dataset[i, y]
                     ll += np.log(self.xyprob[x, y, assignx, assigny] / self.xprob[y, assigny])
         return ll
 
