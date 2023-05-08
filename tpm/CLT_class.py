@@ -7,6 +7,7 @@ Define the Chow_liu Tree class
 
 from __future__ import print_function
 import numpy as np
+import random
 from tpm.Util import *
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
@@ -90,6 +91,34 @@ class CLT:
         edgemat = Util.compute_MI_prob(self.xycounts, self.xcounts) * (-1.0)
         Tree = minimum_spanning_tree(csr_matrix(edgemat))
         self.topo_order, self.parents = depth_first_order(Tree, 0, directed=False)
+
+    def random_forest_update(self, dataset, weights):
+        # Update the Chow-Liu Tree based on a weighted dataset
+        # assume that dataset_.shape[0] equals weights.shape[0] because we assume each example has a weight
+        if not np.all(weights):
+            print('Error: Weight of an example in the dataset is zero')
+            sys.exit(-1)
+        if weights.shape[0] == dataset.shape[0]:
+            # Weighted laplace correction, note that num-examples=dataset.shape[0]
+            # If 1-laplace smoothing is applied to num-examples,
+            # then laplace smoothing applied to "sum-weights" equals "sum-weights/num-examples"
+            smooth = np.sum(weights) / dataset.shape[0]
+            self.xycounts = Util.compute_weighted_xycounts(dataset, weights) + smooth
+            self.xcounts = Util.compute_weighted_xcounts(dataset, weights) + 2.0 * smooth
+        else:
+            print('Error: Each example must have a weight')
+            sys.exit(-1)
+        self.xyprob = Util.normalize2d(self.xycounts)
+        self.xprob = Util.normalize1d(self.xcounts)
+        edgemat = Util.compute_MI_prob(self.xycounts, self.xcounts) * (-1.0)
+        Tree = minimum_spanning_tree(csr_matrix(edgemat))
+        self.topo_order, self.parents = depth_first_order(Tree, 0, directed=False)
+        for i in range(r):
+            row = random.randrange(0, dataset.shape[1])
+            col = random.randrange(0, dataset.shape[1])
+
+            edgemat[row][col] = 0
+            edgemat[col][row] = 0
 
     '''
         Compute the Log-likelihood score of the dataset

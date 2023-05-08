@@ -108,4 +108,4 @@ class Util(object):
         sum_xy += p_xy[:, :, 0, 1] * np.log(np.einsum('ij,i,j->ij', p_xy[:, :, 0, 1], p_x_r[:, 0], p_x_r[:, 1]))
         sum_xy += p_xy[:, :, 1, 0] * np.log(np.einsum('ij,i,j->ij', p_xy[:, :, 1, 0], p_x_r[:, 1], p_x_r[:, 0]))
         sum_xy += p_xy[:, :, 1, 1] * np.log(np.einsum('ij,i,j->ij', p_xy[:, :, 1, 1], p_x_r[:, 1], p_x_r[:, 1]))
-        return sum_xy
+        return sum_xy 
