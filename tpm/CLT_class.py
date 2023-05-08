@@ -92,7 +92,7 @@ class CLT:
         Tree = minimum_spanning_tree(csr_matrix(edgemat))
         self.topo_order, self.parents = depth_first_order(Tree, 0, directed=False)
 
-    def random_forest_update(self, dataset, weights):
+    def random_forest_update(self, dataset, weights, r):
         # Update the Chow-Liu Tree based on a weighted dataset
         # assume that dataset_.shape[0] equals weights.shape[0] because we assume each example has a weight
         if not np.all(weights):
